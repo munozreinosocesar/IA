@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+  <category>
+  <pattern>en que estacion estamos</pattern>
+  <template>
+    estamos en <srai>SEASON</srai>
+  </template>
+  </category>
+
+  <category>
+  <pattern>^ [que cual] ^ estacion ^</pattern>
+  <template>
+    <srai>en que estacion estamos</srai>
+  </template>
+  </category>
+
+  <category>
+  <pattern>* epoca ^</pattern>
+  <template>
+    <srai>en que estacion estamos</srai>
+  </template>
+  </category>
+
+
+
+  <category>
+  <pattern>en que fase del dia estamos</pattern>
+  <template>
+    ahora estamos en la <srai>DAY PHASE</srai>
+  </template>
+</category>
+
+<category>
+<pattern>^ [parte momento lugar] del dia ^</pattern>
+<template>
+  <srai>en que fase del dia estamos</srai>
+</template>
+</category>
+
+  <category>
+  <pattern>que dia de la semana es *</pattern>
+  <template>
+    <think>
+      <set var="dia"><star/></set>
+    </think>
+    <condition var="dia">
+      <li>dime un dia de la semana (hoy manyana o pasado manyana)</li>
+      <li><value>hoy</value><srai>DAY</srai></li>
+      <li><value>manyana</value><srai>TOMORROW</srai></li>
+      <li><value>pasado manyana</value><srai>DAY AFTER TOMORROW</srai></li>
+    </condition>
+  </template>
+  </category>
+
+  <category>
+  <pattern>^ dia de la semana [es sera] *</pattern>
+  <template>
+    <srai>que dia de la semana es <star index="2"/></srai>
+  </template>
+  </category>
+
+  <category>
+  <pattern>[que cual] fecha sera dentro de una semana</pattern>
+  <template>
+    dentro de una semana sera <srai>DATE IN 7 DAYS</srai>
+  </template>
+  </category>
+
+  <category>
+  <pattern>[que cual] sera la fecha en una semana</pattern>
+  <template>
+    <srai>que fecha sera dentro de una semana</srai>
+  </template>
+  </category>
+
+  <category>
+  <pattern>[que cual] [dia fecha] sera en una semana</pattern>
+  <template>
+    <srai>que fecha sera dentro de una semana</srai>
+  </template>
+  </category>
+
+  <category>
+  <pattern>[que cual] fecha sera el proximo <set>weekday_es</set></pattern>
+  <template>
+    el proximo <star/> sera <srai>DATE ON <star/></srai>
+  </template>
+  </category>
+
+  <category>
+  <pattern>[que cual] dia sera el proximo (dia) <set>weekday_es</set></pattern>
+  <template>
+    <srai>que fecha sera el proximo <star/></srai>
+  </template>
+  </category>
+
+</aiml>

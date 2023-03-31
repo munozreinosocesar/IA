@@ -1,0 +1,1911 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+    <category>
+      <pattern>CAMBIOFECHA *</pattern>
+      <template>
+        <think>
+          <set name="fecha"><star index="1"/></set>
+          <set var="dia"><srai>DAY2TWODIGITS <srai>TOP <get name="fecha"/></srai></srai></set>
+          <set name="fecha"> <srai>REMAIN <get name="fecha"/></srai></set>
+
+          <set var="mes"><map name="meses"><srai>TOP <get name="fecha"/></srai></map></set>
+          <set name="fecha"> <srai>REMAIN <get name="fecha"/></srai></set>
+
+          <set var="anyo"><srai>TOP <get name="fecha"/></srai></set>
+        </think>
+          <get var="dia"/>_<get var="mes"/>_<get var="anyo"/>
+      </template>
+    </category>
+
+<!-- Informar del estado de un día especificado con <ESPECIFICA DIA> -->
+
+<category>
+  <pattern>LIBRE * de * del *</pattern>
+  <template>
+    <think>
+      <set name="fecha">
+        <star index="1"/>_<map name="meses"><star index="2"/></map>_<star index="3"/>
+      </set>
+      <set var="lista">
+        <srai>SUBLIST FROM 9 TO 21 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai>
+      </set>
+    </think>
+      <set var="salida">
+        <srai>FINDITEM LIBRE IN <get var="lista"/></srai>
+      </set>
+  </template>
+</category>
+
+  <category>
+    <pattern>LIBRE [proximo siguiente] <set>weekday_es</set></pattern>
+    <template>
+        <set name="fecha">
+          <srai>CAMBIOFECHA <srai>DATE ON <star index="1"/></srai></srai>
+        </set>
+        <set var="lista">
+          <srai>SUBLIST FROM 9 TO 21 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai>
+        </set>
+        <set var="salida">
+          <srai>FINDITEM LIBRE IN <get var="lista"/></srai>
+        </set>
+    </template>
+  </category>
+
+  <category>
+    <pattern>LIBRE *</pattern>
+    <template>
+      <think>
+        <set var="intro">
+          <star index="1"/>
+        </set>
+      </think>
+        <condition var="intro">
+          <li><value>hoy</value>
+          <think>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DATE</srai></srai>
+            </set>
+            <set var="lista">
+              <srai>SUBLIST FROM 9 TO 21 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai>
+            </set>
+          </think>
+            <set var="salida">
+              <srai>FINDITEM LIBRE IN <get var="lista"/></srai>
+            </set>
+          </li>
+          <li><value>manyana</value>
+          <think>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DATE TOMORROW</srai></srai>
+            </set>
+            <set var="lista">
+              <srai>SUBLIST FROM 9 TO 21 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai>
+            </set>
+          </think>
+            <set var="salida">
+              <srai>FINDITEM LIBRE IN <get var="lista"/></srai>
+            </set>
+          </li>
+          <li><value>pasado manyana</value>
+          <think>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DAYAFTERTOMORROWDATE</srai></srai>
+            </set>
+            <set var="lista">
+              <srai>SUBLIST FROM 9 TO 21 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai>
+            </set>
+          </think>
+            <set var="salida">
+              <srai>FINDITEM LIBRE IN <get var="lista"/></srai>
+            </set>
+          </li>
+          <li>MAL</li>
+        </condition>
+    </template>
+  </category>
+
+<!-- Informar de las franjas libres en un día especificado con <ESPECIFICA DIA> -->
+
+<category>
+  <pattern>HORASLIBRES [proximo siguiente] <set>weekday_es</set></pattern>
+  <template>
+    <think>
+      <set name="fecha"><srai>CAMBIOFECHA <srai>DATE ON <star index="1"/></srai></srai></set>
+      <set var="lista"><srai> SUBLIST FROM 9 TO 21 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai></set>
+      <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+      <set var="salida"></set>
+      <set var="hora">8</set>
+    </think>
+    <condition var="contador">
+      <li><value>$</value><get var="salida"/></li>
+      <li>
+        <value>LIBRE</value>
+        <think>
+          <set var="salida"> <get var="salida"/> <srai>DAY2TWODIGITS <get var="hora"/></srai>:00</set>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+      <li>
+        <think>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+    </condition>
+  </template>
+</category>
+
+<category>
+  <pattern>HORASLIBRES *</pattern>
+  <template>
+    <think>
+        <set var="intro">
+          <star index="1"/>
+        </set>
+        <condition var="intro">
+          <li><value>hoy</value>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DATE</srai></srai>
+            </set>
+          </li>
+          <li><value>manyana</value>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DATE TOMORROW</srai></srai>
+            </set>
+          </li>
+          <li><value>pasado manyana</value>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DAYAFTERTOMORROWDATE</srai></srai>
+            </set>
+          </li>
+          <li> especifique (hoy manyana o pasado manyana)</li>
+        </condition>
+      <set var="lista"><srai> SUBLIST FROM 9 TO 21 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai></set>
+      <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+      <set var="salida"></set>
+      <set var="hora">8</set>
+    </think>
+    <condition var="contador">
+      <li><value>$</value><get var="salida"/></li>
+      <li>
+        <value>LIBRE</value>
+        <think>
+          <set var="salida"> <get var="salida"/> <srai>DAY2TWODIGITS <get var="hora"/></srai>:00</set>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+      <li>
+        <think>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+    </condition>
+  </template>
+</category>
+
+<!-- Informar de las franjas libres por la mañana en un día especificado con <ESPECIFICA DIA> -->
+
+<category>
+  <pattern>HORASLIBRES * de * del * por la manyana</pattern>
+  <template>
+    <think>
+      <set name="fecha"><star index="1"/>_<map name="meses"><star index="2"/></map>_<star index="3"/></set>
+      <set var="lista"><srai> SUBLIST FROM 9 TO 13 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai></set>
+      <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+      <set var="salida"></set>
+      <set var="hora">8</set>
+    </think>
+    <condition var="contador">
+      <li><value>$</value><get var="salida"/></li>
+      <li>
+        <value>LIBRE</value>
+        <think>
+          <set var="salida"> <get var="salida"/> <srai>DAY2TWODIGITS <get var="hora"/></srai>:00</set>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+      <li>
+        <think>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+    </condition>
+    </template>
+    </category>
+
+<category>
+  <pattern>HORASLIBRES [proximo siguiente] <set>weekday_es</set> por la manyana</pattern>
+  <template>
+    <think>
+      <set name="fecha"><srai>CAMBIOFECHA <srai>DATE ON <star index="1"/></srai></srai></set>
+      <set var="lista"><srai> SUBLIST FROM 9 TO 13 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai></set>
+      <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+      <set var="salida"></set>
+      <set var="hora">8</set>
+    </think>
+    <condition var="contador">
+      <li><value>$</value><get var="salida"/></li>
+      <li>
+        <value>LIBRE</value>
+        <think>
+          <set var="salida"> <get var="salida"/> <srai>DAY2TWODIGITS <get var="hora"/></srai>:00</set>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+      <li>
+        <think>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+    </condition>
+    </template>
+    </category>
+
+<category>
+  <pattern>HORASLIBRES * por la manyana</pattern>
+  <template>
+    <think>
+        <set var="intro">
+          <star index="1"/>
+        </set>
+        <condition var="intro">
+          <li><value>hoy</value>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DATE</srai></srai>
+            </set>
+          </li>
+          <li><value>manyana</value>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DATE TOMORROW</srai></srai>
+            </set>
+          </li>
+          <li><value>pasado manyana</value>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DAYAFTERTOMORROWDATE</srai></srai>
+            </set>
+          </li>
+          <li>MAL</li>
+        </condition>
+      <set var="lista"><srai> SUBLIST FROM 9 TO 13 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai></set>
+      <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+      <set var="salida"></set>
+      <set var="hora">8</set>
+    </think>
+    <condition var="contador">
+      <li><value>$</value><get var="salida"/></li>
+      <li>
+        <value>LIBRE</value>
+        <think>
+          <set var="salida"> <get var="salida"/> <srai>DAY2TWODIGITS <get var="hora"/></srai>:00</set>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+      <li>
+        <think>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+    </condition>
+    </template>
+    </category>
+
+<!-- Informar de las franjas libres por la tarde en un día especificado con <ESPECIFICA DIA> -->
+
+<category>
+  <pattern>HORASLIBRES * de * del * por la tarde</pattern>
+  <template>
+    <think>
+      <set name="fecha"><star index="1"/>_<map name="meses"><star index="2"/></map>_<star index="3"/></set>
+      <set var="lista"><srai> SUBLIST FROM 14 TO 21 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai></set>
+      <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+      <set var="salida"></set>
+      <set var="hora">13</set>
+    </think>
+    <condition var="contador">
+      <li><value>$</value><get var="salida"/></li>
+      <li>
+        <value>LIBRE</value>
+        <think>
+          <set var="salida"> <get var="salida"/> <srai>DAY2TWODIGITS <get var="hora"/></srai>:00</set>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+      <li>
+        <think>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+    </condition>
+    </template>
+    </category>
+
+<category>
+  <pattern>HORASLIBRES [proximo siguiente] <set>weekday_es</set> por la tarde</pattern>
+  <template>
+    <think>
+      <set name="fecha"><srai>CAMBIOFECHA <srai>DATE ON <star index="1"/></srai></srai></set>
+      <set var="lista"><srai> SUBLIST FROM 14 TO 21 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai></set>
+      <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+      <set var="salida"></set>
+      <set var="hora">13</set>
+    </think>
+    <condition var="contador">
+      <li><value>$</value><get var="salida"/></li>
+      <li>
+        <value>LIBRE</value>
+        <think>
+          <set var="salida"> <get var="salida"/> <srai>DAY2TWODIGITS <get var="hora"/></srai>:00</set>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+      <li>
+        <think>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+    </condition>
+    </template>
+    </category>
+
+<category>
+  <pattern>HORASLIBRES * por la tarde</pattern>
+  <template>
+    <think>
+        <set var="intro">
+          <star index="1"/>
+        </set>
+        <condition var="intro">
+          <li><value>hoy</value>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DATE</srai></srai>
+            </set>
+          </li>
+          <li><value>manyana</value>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DATE TOMORROW</srai></srai>
+            </set>
+          </li>
+          <li><value>pasado manyana</value>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DAYAFTERTOMORROWDATE</srai></srai>
+            </set>
+          </li>
+          <li>MAL</li>
+        </condition>
+      <set var="lista"><srai> SUBLIST FROM 14 TO 21 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai></set>
+      <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+      <set var="salida"></set>
+      <set var="hora">13</set>
+    </think>
+    <condition var="contador">
+      <li><value>$</value><get var="salida"/></li>
+      <li>
+        <value>LIBRE</value>
+        <think>
+          <set var="salida"> <get var="salida"/> <srai>DAY2TWODIGITS <get var="hora"/></srai>:00</set>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+      <li>
+        <think>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+    </condition>
+    </template>
+    </category>
+
+<!-- Informar de las franjas libres a partir de una hora dada en un día especificado con <ESPECIFICA DIA> -->
+
+<category>
+  <pattern>HORASLIBRES * de * del * a partir de las *</pattern>
+  <template>
+    <think>
+      <set name="fecha"><star index="1"/>_<map name="meses"><star index="2"/></map>_<star index="3"/></set>
+      <set var="lista"><srai> SUBLIST FROM <srai>ORDINAL <star index="4"/></srai> TO 21 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai></set>
+      <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+      <set var="salida"></set>
+      <set var="hora"><srai>MINUS <srai>ORDINAL <star index="4"/></srai> 1</srai></set>
+    </think>
+    <condition var="contador">
+      <li><value>$</value><get var="salida"/></li>
+      <li>
+        <value>LIBRE</value>
+        <think>
+          <set var="salida"> <get var="salida"/> <srai>DAY2TWODIGITS <get var="hora"/></srai>:00</set>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+      <li>
+        <think>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+    </condition>
+    </template>
+    </category>
+
+<category>
+  <pattern>HORASLIBRES [proximo siguiente] <set>weekday_es</set> a partir de las *</pattern>
+  <template>
+    <think>
+      <set name="fecha"><srai>CAMBIOFECHA <srai>DATE ON <star index="1"/></srai></srai></set>
+      <set var="lista"><srai> SUBLIST FROM <srai>ORDINAL <star index="2"/></srai> TO 21 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai></set>
+      <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+      <set var="salida"></set>
+      <set var="hora"><srai>MINUS <srai>ORDINAL <star index="2"/></srai> 1</srai></set>
+    </think>
+    <condition var="contador">
+      <li><value>$</value><get var="salida"/></li>
+      <li>
+        <value>LIBRE</value>
+        <think>
+          <set var="salida"> <get var="salida"/> <srai>DAY2TWODIGITS <get var="hora"/></srai>:00</set>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+      <li>
+        <think>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+    </condition>
+    </template>
+    </category>
+
+<category>
+  <pattern>HORASLIBRES * a partir de las *</pattern>
+  <template>
+    <think>
+        <set var="intro">
+          <star index="1"/>
+        </set>
+        <condition var="intro">
+          <li><value>hoy</value>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DATE</srai></srai>
+            </set>
+          </li>
+          <li><value>manyana</value>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DATE TOMORROW</srai></srai>
+            </set>
+          </li>
+          <li><value>pasado manyana</value>
+            <set name="fecha">
+              <srai>CAMBIOFECHA <srai>DAYAFTERTOMORROWDATE</srai></srai>
+            </set>
+          </li>
+          <li>MAL</li>
+        </condition>
+      <set var="lista"><srai> SUBLIST FROM <srai>ORDINAL <star index="2"/></srai> TO 21 OF <srai>LIST OF DAY <get name="fecha"/></srai> </srai></set>
+      <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+      <set var="salida"></set>
+      <set var="hora"><srai>MINUS <srai>ORDINAL <star index="2"/></srai> 1</srai></set>
+    </think>
+    <condition var="contador">
+      <li><value>$</value><get var="salida"/></li>
+      <li>
+        <value>LIBRE</value>
+        <think>
+          <set var="salida"> <get var="salida"/> <srai>DAY2TWODIGITS <get var="hora"/></srai>:00</set>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+      <li>
+        <think>
+          <set var="hora"> <srai>PLUS <get var="hora"/> 1 </srai></set>
+          <set var="lista"><srai> REMAIN <get var="lista"/></srai></set>
+          <set var="contador"><srai> TOP <get var="lista"/></srai></set>
+        </think>
+        <loop/>
+      </li>
+    </condition>
+    </template>
+    </category>
+
+<!--REGLAS-->
+
+    <!--FECHA-->
+
+    <!--MANYANA-->
+    <category>
+      <pattern>[quiero querria quisiera] (concertar) una cita (para) el (dia) * de * del * por la manyana</pattern>
+      <template>
+        <think>
+          <set name="horas manyana"><srai>HORASLIBRES <star index="1"/> de <star index="2"/> del <star index="3"/> por la manyana</srai></set>
+        </think>
+        <condition name="horas manyana">
+          <li><value></value>Lo siento no puedo esta ocupado por la manyana, ¿desea <set name="topic">otro dia</set>?</li>
+          <li>
+            Muy bien voy a comprobarlo, espere un momento...
+            <random>
+              <li>
+                <think><set name="topic">hora manyana</set></think>
+                ¿Quisiera alguna hora en concreto?
+              </li>
+              <li>
+                <think><set name="topic">hora2</set></think>
+                Pues por la manyana tengo los siguientes huecos libres <get name="horas manyana"/>
+              </li>
+            </random>
+          </li>
+        </condition>
+      </template>
+    </category>
+
+    <category>
+      <pattern>me gustaria (concertar) una cita (para) el (dia) * de * del * por la manyana</pattern>
+      <template>
+        <srai>quisiera una cita el <star index="1"/> de <star index="2"/> del <star index="3"/> por la manyana</srai>
+      </template>
+    </category>
+
+    <category>
+      <pattern>como tienes el (dia) * de * del * para (concertar) una cita por la manyana</pattern>
+      <template>
+        <srai>quisiera una cita el <star index="1"/> de <star index="2"/> del <star index="3"/> por la manyana</srai>
+      </template>
+    </category>
+
+
+<!-- TOPIC FECHA MANYANA-->
+    <topic name="hora manyana">
+
+      <category>
+        <pattern>[si vale] a las *</pattern>
+        <template>
+          <think>
+            <set var="ocupado"> <srai>IS BUSY DAY <get name="fecha"/> AT <star index="1"/></srai></set>
+          </think>
+          <condition var="ocupado">
+            <li><value>TRUE</value>Esa hora esta ocupada, ¿desea otra hora?</li>
+            <li><value>FALSE</value>
+              <think>
+                <srai>MARK NOLIBRE AT <star index="1"/> ON <get name="fecha"/> </srai>
+              </think>
+              Perfecto, le reservo a esa hora.
+            </li>
+          </condition>
+        </template>
+      </category>
+
+      <category>
+        <pattern>a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+      
+      <category>
+        <pattern>[puede podria] (ser) a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+      <category>
+        <pattern>me gustaria (concertar) (la cita) a las *</pattern>
+        <template>
+          <srai> si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+        <category>
+          <pattern>[si vale]</pattern>
+          <template>
+            <random>
+              <li>¿Para que hora quisiera la cita?</li>
+              <li>¿Cuando le viene bien la cita?</li>
+              <li>¿A que hora le viene bien la cita?</li>
+              <li>¿A que hora puede?</li>
+            </random>
+          </template>
+        </category>
+
+        <category>
+          <pattern>no</pattern>
+          <template>
+            <random>
+              <li>Vale, que tenga un buen dia.</li>
+              <li>Buen dia.</li>
+              <li>Esta bien, adios.</li>
+            </random>
+          </template>
+        </category>
+
+      <category>
+        <pattern>me [da es] igual</pattern>
+        <template>
+          <think>
+            <set var="primera"><srai>TOP <get name="horas manyana"/></srai></set>
+            <srai>MARK NOLIBRE AT <get var="primera"/> ON <get name="fecha"/></srai>
+          </think>
+          Perfecto, le reservo a las <get var="primera"/>.
+        </template>
+      </category>
+    </topic>
+
+
+<!-- TARDE -->
+
+    <category>
+      <pattern>[quiero querria quisiera] (concertar) una cita (para) el (dia) * de * del * por la tarde</pattern>
+      <template>
+        <think>
+          <set name="horas tarde"><srai>HORASLIBRES <star index="1"/> de <star index="2"/> del <star index="3"/> por la tarde</srai></set>
+        </think>
+        <condition name="horas tarde">
+          <li><value></value>Lo siento no puedo esta ocupado por la tarde, ¿desea <set name="topic">otro dia</set>?</li>
+          <li>
+            Muy bien voy a comprobarlo, espere un momento...
+            <random>
+              <li><think><set name="topic">hora tarde</set></think>
+                ¿Quisiera alguna hora en concreto?
+              </li>
+              <li>
+                <think><set name="topic">hora2</set></think>
+                Pues por la tarde tengo los siguientes huecos libres <get name="horas tarde"/>
+              </li>
+            </random>
+          </li>
+        </condition>
+      </template>
+    </category>
+
+    <category>
+      <pattern>me gustaria (concertar) una cita (para) el (dia) * de * del * por la tarde</pattern>
+      <template>
+        <srai>quisiera una cita el <star index="1"/> de <star index="2"/> del <star index="3"/> por la tarde</srai>
+      </template>
+    </category>
+
+    <category>
+      <pattern>como tienes el (dia) * de * del * para (concertar) una cita por la tarde</pattern>
+      <template>
+        <srai>quisiera una cita el <star index="1"/> de <star index="2"/> del <star index="3"/> por la tarde</srai>
+      </template>
+    </category>
+
+
+    <!-- TOPIC FECHA TARDE-->
+
+    <topic name="hora tarde">
+      <category>
+        <pattern>[si vale] a las *</pattern>
+        <template>
+          <think>
+            <set var="ocupado"> <srai>IS BUSY DAY <get name="fecha"/> AT <star index="1"/></srai></set>
+          </think>
+          <condition var="ocupado">
+            <li><value>TRUE</value>Esa hora esta ocupada, ¿desea otra hora?</li>
+            <li><value>FALSE</value>
+              <think>
+                <srai>MARK NOLIBRE AT <star index="1"/> ON <get name="fecha"/> </srai>
+              </think>
+              Perfecto, le reservo a esa hora.
+            </li>
+          </condition>
+        </template>
+      </category>
+
+      <category>
+        <pattern>a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+      <category>
+        <pattern>[puede podria] (ser) a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+      <category>
+        <pattern>me gustaria (concertar) (la cita) a las *</pattern>
+        <template>
+          <srai> si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+        <category>
+          <pattern>[si vale]</pattern>
+          <template>
+            <random>
+              <li>¿Para que hora quisiera la cita?</li>
+              <li>¿Cuando le viene bien la cita?</li>
+              <li>¿A que hora le viene bien la cita?</li>
+              <li>¿A que hora puede?</li>
+            </random>
+          </template>
+        </category>
+
+        <category>
+          <pattern>no</pattern>
+          <template>
+            <random>
+              <li>Vale, que tenga un buen dia.</li>
+              <li>Buen dia.</li>
+              <li>Esta bien, adios.</li>
+            </random>
+          </template>
+        </category>
+
+      <category>
+        <pattern>me [da es] igual</pattern>
+        <template>
+          <think>
+            <set var="primera"><srai>TOP <get name="horas tarde"/></srai></set>
+            <srai>MARK NOLIBRE AT <get var="primera"/> ON <get name="fecha"/></srai>
+          </think>
+          Perfecto, le reservo a las <get var="primera"/>.
+        </template>
+      </category>
+    </topic>
+
+    <!-- HORA -->
+
+    <category>
+      <pattern>[quiero querria quisiera] (concertar) una cita (para) el (dia) * de * del * a partir de las *</pattern>
+      <template>
+        <think>
+          <set name="horas hora"><srai>HORASLIBRES <star index="1"/> de <star index="2"/> del <star index="3"/> a partir de las <star index="4"/></srai></set>
+        </think>
+        <condition name="horas hora">
+          <li><value></value>Lo siento no puedo esta ocupado a partir de las <star index="4"/>, ¿desea <set name="topic">otro dia</set>?</li>
+          <li>
+            Muy bien voy a comprobarlo, espere un momento...
+            <random>
+              <li><think><set name="topic">hora hora</set></think>
+                ¿Quisiera alguna hora en concreto?
+              </li>
+              <li>
+                <think><set name="topic">hora2</set></think>
+                Pues a partir de las <star index="4"/> tengo los siguientes huecos libres <get name="horas hora"/>
+              </li>
+            </random>
+          </li>
+        </condition>
+      </template>
+    </category>
+
+    <category>
+      <pattern>me gustaria (concertar) una cita (para) el (dia) * de * del * a partir de las *</pattern>
+      <template>
+        <srai>quisiera una cita el <star index="1"/> de <star index="2"/> del <star index="3"/> a partir de las <star index="4"/></srai>
+      </template>
+    </category>
+
+    <category>
+      <pattern>como tienes el (dia) * de * del * para (concertar) una cita a partir de las *</pattern>
+      <template>
+        <srai>quisiera una cita el <star index="1"/> de <star index="2"/> del <star index="3"/> a partir de las <star index="4"/></srai>
+      </template>
+    </category>
+
+
+    <!-- TOPIC FECHA HORA-->
+
+    <topic name="hora hora">
+
+      <category>
+        <pattern>[si vale] a las *</pattern>
+        <template>
+          <think>
+            <set var="ocupado"> <srai>IS BUSY DAY <get name="fecha"/> AT <star index="1"/></srai></set>
+          </think>
+          <condition var="ocupado">
+            <li><value>TRUE</value>Esa hora esta ocupada, ¿desea otra hora?</li>
+            <li><value>FALSE</value>
+              <think>
+                <srai>MARK NOLIBRE AT <star index="1"/> ON <get name="fecha"/> </srai>
+              </think>
+              Perfecto, le reservo a esa hora.
+            </li>
+          </condition>
+        </template>
+      </category>
+
+      <category>
+        <pattern>a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+      <category>
+        <pattern>[puede podria] (ser) a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+      <category>
+        <pattern>me gustaria (concertar) (la cita) a las *</pattern>
+        <template>
+          <srai> si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+        <category>
+          <pattern>[si vale]</pattern>
+          <template>
+            <random>
+              <li>¿Para que hora quisiera la cita?</li>
+              <li>¿Cuando le viene bien la cita?</li>
+              <li>¿A que hora le viene bien la cita?</li>
+              <li>¿A que hora puede?</li>
+            </random>
+          </template>
+        </category>
+
+        <category>
+          <pattern>no</pattern>
+          <template>
+            <random>
+              <li>Vale, que tenga un buen dia.</li>
+              <li>Buen dia.</li>
+              <li>Esta bien, adios.</li>
+            </random>
+          </template>
+        </category>
+
+      <category>
+        <pattern>me [da es] igual</pattern>
+        <template>
+          <think>
+            <set var="primera"><srai>TOP <get name="horas hora"/></srai></set>
+            <srai>MARK NOLIBRE AT <get var="primera"/> ON <get name="fecha"/></srai>
+          </think>
+          Perfecto, le reservo a las <get var="primera"/>.
+        </template>
+      </category>
+    </topic>
+
+
+
+
+<!-- PROXIMO DIA X -->
+
+<category>
+  <pattern>[quiero querria quisiera] (concertar) una cita (para) el [proximo siguiente] <set>weekday_es</set></pattern>
+  <template>
+    <think>
+      <set var="libre"><srai>LIBRE siguiente <star index="1"/></srai></set>
+      <set name="horas prox"><srai>HORASLIBRES siguiente <star index="1"/></srai></set>
+    </think>
+    <condition var="libre">
+      <li><value>0</value>Lo siento no puedo esta ocupado, ¿desea <set name="topic">otro dia</set>?</li>
+      <li>
+        Muy bien voy a comprobarlo, espere un momento...
+        <random>
+          <li><think><set name="topic">hora prox</set></think>
+            ¿Quisiera alguna hora en concreto?
+          </li>
+          <li>
+            <think>
+              <set name="topic">hora2</set>
+              <set var="manyana"><srai>HORASLIBRES siguiente <star index="1"/> por la manyana</srai></set>
+              <set var="tarde"><srai>HORASLIBRES siguiente <star index="1"/> por la tarde</srai></set>
+            </think>
+            <condition var="manyana">
+              <li><value></value>Pues la manyana la tengo ocupada y por la tarde tengo los siguientes huecos libres <get var="tarde"/></li>
+              <li>
+                <condition var="tarde">
+                  <li><value></value>Pues por la manyana tengo los siguientes huecos libres <get var="manyana"/> y toda la tarde ocupada </li>
+                  <li>
+                    Pues por la manyana tengo los siguientes huecos libres <get var="manyana"/> y por la tarde <get var="tarde"/></li>
+                </condition>
+              </li>
+            </condition>
+          </li>
+        </random>
+      </li>
+    </condition>
+  </template>
+</category>
+
+
+<category>
+  <pattern>me gustaria (concertar) una cita (para) el [proximo siguiente] <set>weekday_es</set></pattern>
+  <template>
+    <srai>quisiera una cita el proximo <star index="1"/></srai>
+  </template>
+</category>
+
+<category>
+  <pattern>como tienes el [proximo siguiente] <set>weekday_es</set> para (concertar) una cita</pattern>
+  <template>
+    <srai>quisiera una cita el proximo <star index="1"/></srai>
+  </template>
+</category>
+
+<!-- TOPIC PROX -->
+
+
+<topic name="hora prox">
+
+  <category>
+    <pattern>[si vale] a las *</pattern>
+    <template>
+      <think>
+        <set var="ocupado"> <srai>IS BUSY DAY <get name="fecha"/> AT <star index="1"/></srai></set>
+      </think>
+      <condition var="ocupado">
+        <li><value>TRUE</value>Esa hora esta ocupada, ¿desea otra hora?</li>
+        <li><value>FALSE</value>
+          <think>
+            <srai>MARK NOLIBRE AT <star index="1"/> ON <get name="fecha"/> </srai>
+          </think>
+          Perfecto, le reservo a esa hora.
+        </li>
+      </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern>a las *</pattern>
+    <template>
+      <srai>si a las <star index="1"/></srai>
+    </template>
+  </category>
+
+  <category>
+    <pattern>[puede podria] (ser) a las *</pattern>
+    <template>
+      <srai>si a las <star index="1"/></srai>
+    </template>
+  </category>
+
+  <category>
+    <pattern>me gustaria (concertar) (la cita) a las *</pattern>
+    <template>
+      <srai> si a las <star index="1"/></srai>
+    </template>
+  </category>
+
+    <category>
+      <pattern>[si vale]</pattern>
+      <template>
+        <random>
+          <li>¿Para que hora quisiera la cita?</li>
+          <li>¿Cuando le viene bien la cita?</li>
+          <li>¿A que hora le viene bien la cita?</li>
+          <li>¿A que hora puede?</li>
+        </random>
+      </template>
+    </category>
+
+    <category>
+      <pattern>no</pattern>
+      <template>
+        <random>
+          <li>Vale, que tenga un buen dia.</li>
+          <li>Buen dia.</li>
+          <li>Esta bien, adios.</li>
+        </random>
+      </template>
+    </category>
+
+  <category>
+    <pattern>me [da es] igual</pattern>
+    <template>
+      <think>
+        <set var="primera"><srai>TOP <get name="horas prox"/></srai></set>
+        <srai>MARK NOLIBRE AT <get var="primera"/> ON <get name="fecha"/></srai>
+      </think>
+      Perfecto, le reservo a las <get var="primera"/>.
+    </template>
+  </category>
+</topic>
+
+
+
+<!-- MANYANA-->
+    <category>
+      <pattern>[quiero querria quisiera] (concertar) una cita (para) el [proximo siguiente] <set>weekday_es</set> por la manyana</pattern>
+      <template>
+        <think>
+          <set name="horas prox manyana"><srai>HORASLIBRES siguiente <star index="1"/> por la manyana</srai></set>
+        </think>
+        <condition name="horas prox manyana">
+          <li><value></value>Lo siento no puedo esta ocupado por la manyana, ¿desea <set name="topic">otro dia</set>?</li>
+          <li>
+            Muy bien voy a comprobarlo, espere un momento...
+            <random>
+              <li><think><set name="topic">horas prox manyana</set></think>
+                ¿Quisiera alguna hora en concreto?
+              </li>
+              <li>
+                <think><set name="topic">hora2</set></think>
+                Pues por la manyana tengo los siguientes huecos libres <get name="horas prox manyana"/>
+              </li>
+            </random>
+          </li>
+        </condition>
+      </template>
+    </category>
+
+    <category>
+      <pattern>me gustaria (concertar) una cita (para) el [proximo siguiente] <set>weekday_es</set> por la manyana</pattern>
+      <template>
+        <srai>quisiera una cita el proximo <star index="1"/> por la manyana</srai>
+      </template>
+    </category>
+
+    <category>
+      <pattern>como tienes el [proximo siguiente] <set>weekday_es</set> para (concertar) una cita por la manyana</pattern>
+      <template>
+        <srai>quisiera una cita el proximo <star index="1"/> por la manyana</srai>
+      </template>
+    </category>
+
+    <!-- TOPIC PROX MANYANA-->
+
+    <topic name="horas prox manyana">
+
+      <category>
+        <pattern>[si vale] a las *</pattern>
+        <template>
+          <think>
+            <set var="ocupado"> <srai>IS BUSY DAY <get name="fecha"/> AT <star index="1"/></srai></set>
+          </think>
+          <condition var="ocupado">
+            <li><value>TRUE</value>Esa hora esta ocupada, ¿desea otra hora?</li>
+            <li><value>FALSE</value>
+              <think>
+                <srai>MARK NOLIBRE AT <star index="1"/> ON <get name="fecha"/> </srai>
+              </think>
+              Perfecto, le reservo a esa hora.
+            </li>
+          </condition>
+        </template>
+      </category>
+
+      <category>
+        <pattern>a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+      <category>
+        <pattern>[puede podria] (ser) a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+      <category>
+        <pattern>me gustaria (concertar) (la cita) a las *</pattern>
+        <template>
+          <srai> si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+        <category>
+          <pattern>[si vale]</pattern>
+          <template>
+            <random>
+              <li>¿Para que hora quisiera la cita?</li>
+              <li>¿Cuando le viene bien la cita?</li>
+              <li>¿A que hora le viene bien la cita?</li>
+              <li>¿A que hora puede?</li>
+            </random>
+          </template>
+        </category>
+
+        <category>
+          <pattern>no</pattern>
+          <template>
+            <random>
+              <li>Vale, que tenga un buen dia.</li>
+              <li>Buen dia.</li>
+              <li>Esta bien, adios.</li>
+            </random>
+          </template>
+        </category>
+
+      <category>
+        <pattern>me [da es] igual</pattern>
+        <template>
+          <think>
+            <set var="primera"><srai>TOP <get name="horas prox manyana"/></srai></set>
+            <srai>MARK NOLIBRE AT <get var="primera"/> ON <get name="fecha"/></srai>
+          </think>
+          Perfecto, le reservo a las <get var="primera"/>.
+        </template>
+      </category>
+    </topic>
+
+
+<!-- TARDE -->
+
+    <category>
+      <pattern>[quiero querria quisiera] (concertar) una cita (para) el [proximo siguiente] <set>weekday_es</set> por la tarde</pattern>
+      <template>
+        <think>
+          <set name="horas prox tarde"><srai>HORASLIBRES siguiente <star index="1"/> por la tarde</srai></set>
+        </think>
+        <condition name="horas prox tarde">
+          <li><value></value>Lo siento no puedo esta ocupado por la tarde, ¿desea <set name="topic">otro dia</set>?</li>
+          <li>
+            Muy bien voy a comprobarlo, espere un momento...
+            <random>
+              <li><think><set name="topic">horas prox tarde</set></think>
+                ¿Quisiera alguna hora en concreto?
+              </li>
+              <li>
+                <think><set name="topic">hora2</set></think>
+                Pues por la tarde tengo los siguientes huecos libres <get name="horas prox tarde"/>
+              </li>
+            </random>
+          </li>
+        </condition>
+      </template>
+    </category>
+
+        <category>
+          <pattern>me gustaria (concertar) una cita (para) el [proximo siguiente] <set>weekday_es</set> por la tarde</pattern>
+          <template>
+            <srai>quisiera una cita el proximo <star index="1"/> por la tarde</srai>
+          </template>
+        </category>
+
+        <category>
+          <pattern>como tienes el [proximo siguiente] <set>weekday_es</set> para (concertar) una cita por la tarde</pattern>
+          <template>
+            <srai>quisiera una cita el proximo <star index="1"/> por la tarde</srai>
+          </template>
+        </category>
+
+        <!-- TOPIC PROX TARDE-->
+
+    <topic name="horas prox tarde">
+
+      <category>
+        <pattern>[si vale] a las *</pattern>
+        <template>
+          <think>
+            <set var="ocupado"> <srai>IS BUSY DAY <get name="fecha"/> AT <star index="1"/></srai></set>
+          </think>
+          <condition var="ocupado">
+            <li><value>TRUE</value>Esa hora esta ocupada, ¿desea otra hora?</li>
+            <li><value>FALSE</value>
+              <think>
+                <srai>MARK NOLIBRE AT <star index="1"/> ON <get name="fecha"/> </srai>
+              </think>
+              Perfecto, le reservo a esa hora.
+            </li>
+          </condition>
+        </template>
+      </category>
+
+      <category>
+        <pattern>a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+      <category>
+        <pattern>[puede podria] (ser) a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+      <category>
+        <pattern>me gustaria (concertar) (la cita) a las *</pattern>
+        <template>
+          <srai> si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+        <category>
+          <pattern>[si vale]</pattern>
+          <template>
+            <random>
+              <li>¿Para que hora quisiera la cita?</li>
+              <li>¿Cuando le viene bien la cita?</li>
+              <li>¿A que hora le viene bien la cita?</li>
+              <li>¿A que hora puede?</li>
+            </random>
+          </template>
+        </category>
+
+        <category>
+          <pattern>no</pattern>
+          <template>
+            <random>
+              <li>Vale, que tenga un buen dia.</li>
+              <li>Buen dia.</li>
+              <li>Esta bien, adios.</li>
+            </random>
+          </template>
+        </category>
+
+      <category>
+        <pattern>me [da es] igual</pattern>
+        <template>
+          <think>
+            <set var="primera"><srai>TOP <get name="horas prox tarde"/></srai></set>
+            <srai>MARK NOLIBRE AT <get var="primera"/> ON <get name="fecha"/></srai>
+          </think>
+          Perfecto, le reservo a las <get var="primera"/>.
+        </template>
+      </category>
+    </topic>
+
+    <!-- HORA -->
+
+    <category>
+      <pattern>[quiero querria quisiera] (concertar) una cita (para) el [proximo siguiente] <set>weekday_es</set> a partir de las *</pattern>
+      <template>
+        <think>
+          <set name="horas prox hora"><srai>HORASLIBRES siguiente <star index="1"/> a partir de las <star index="2"/></srai></set>
+        </think>
+        <condition name="horas prox hora">
+          <li><value></value>Lo siento no puedo esta ocupado a partir de las <star index="2"/>, ¿desea <set name="topic">otro dia</set>?</li>
+          <li>
+            Muy bien voy a comprobarlo, espere un momento...
+            <random>
+              <li><think><set name="topic">horas prox hora</set></think>
+              ¿Quisiera alguna hora en concreto?</li>
+              <li>
+                <think><set name="topic">hora2</set></think>
+                Pues a partir de las <star index="2"/> tengo los siguientes huecos libres <get name="horas prox hora"/></li>
+            </random>
+          </li>
+        </condition>
+      </template>
+    </category>
+
+    <category>
+      <pattern>me gustaria (concertar) una cita (para) el [proximo siguiente] <set>weekday_es</set> a partir de las *</pattern>
+      <template>
+        <srai>quisiera una cita el proximo <star index="1"/> a partir de las <star index="2"/></srai>
+      </template>
+    </category>
+
+    <category>
+      <pattern>como tienes el [proximo siguiente] <set>weekday_es</set> para (concertar) una cita a partir de las *</pattern>
+      <template>
+        <srai>quisiera una cita el proximo <star index="1"/> a partir de las <star index="2"/></srai>
+      </template>
+    </category>
+
+    <!-- TOPIC PROX HORA-->
+
+    <topic name="horas prox hora">
+
+      <category>
+        <pattern>[si vale] a las *</pattern>
+        <template>
+          <think>
+            <set var="ocupado"> <srai>IS BUSY DAY <get name="fecha"/> AT <star index="1"/></srai></set>
+          </think>
+          <condition var="ocupado">
+            <li><value>TRUE</value>Esa hora esta ocupada, ¿desea otra hora?</li>
+            <li><value>FALSE</value>
+              <think>
+                <srai>MARK NOLIBRE AT <star index="1"/> ON <get name="fecha"/> </srai>
+              </think>
+              Perfecto, le reservo a esa hora.
+            </li>
+          </condition>
+        </template>
+      </category>
+
+      <category>
+        <pattern>a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+      <category>
+        <pattern>[puede podria] (ser) a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+      <category>
+        <pattern>me gustaria (concertar) (la cita) a las *</pattern>
+        <template>
+          <srai> si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+        <category>
+          <pattern>[si vale]</pattern>
+          <template>
+            <random>
+              <li>¿Para que hora quisiera la cita?</li>
+              <li>¿Cuando le viene bien la cita?</li>
+              <li>¿A que hora le viene bien la cita?</li>
+              <li>¿A que hora puede?</li>
+            </random>
+          </template>
+        </category>
+
+        <category>
+          <pattern>no</pattern>
+          <template>
+            <random>
+              <li>Vale, que tenga un buen dia.</li>
+              <li>Buen dia.</li>
+              <li>Esta bien, adios.</li>
+            </random>
+          </template>
+        </category>
+
+      <category>
+        <pattern>me [da es] igual</pattern>
+        <template>
+          <think>
+            <set var="primera"><srai>TOP <get name="horas prox hora"/></srai></set>
+            <srai>MARK NOLIBRE AT <get var="primera"/> ON <get name="fecha"/></srai>
+          </think>
+          Perfecto, le reservo a las <get var="primera"/>.
+        </template>
+      </category>
+    </topic>
+
+<!-- HOY MANYANA PASADO MANYANA -->
+
+<category>
+  <pattern>[quiero querria quisiera] (concertar) una cita (para) *</pattern>
+  <template>
+    <think>
+      <set var="libre"><srai>LIBRE <star index="1"/></srai></set>
+      <set name="horas dia"><srai>HORASLIBRES <star index="1"/></srai></set>
+    </think>
+    <condition var="libre">
+      <li><value>0</value>Lo siento no puedo esta ocupado , ¿desea <set name="topic">otro dia</set>?</li>
+      <li><value>MAL</value>Especifique (hoy manyana o pasado manyana)</li>
+      <li>
+        Muy bien voy a comprobarlo, espere un momento...
+        <random>
+          <li><think><set name="topic">hora dia</set></think>
+            ¿Quisiera alguna hora en concreto?
+          </li>
+          <li>
+            <think>
+              <set name="topic">hora2</set>
+              <set var="manyana"><srai>HORASLIBRES <star index="1"/> por la manyana</srai></set>
+              <set var="tarde"><srai>HORASLIBRES <star index="1"/> por la tarde</srai></set>
+            </think>
+            <condition var="manyana">
+              <li><value></value>Pues la manyana la tengo ocupada y por la tarde tengo los siguientes huecos libres <get var="tarde"/></li>
+              <li>
+                <condition var="tarde">
+                  <li><value></value>Pues por la manyana tengo los siguientes huecos libres <get var="manyana"/> y toda la tarde ocupada </li>
+                  <li>
+                    Pues por la manyana tengo los siguientes huecos libres <get var="manyana"/> y por la tarde <get var="tarde"/></li>
+                </condition>
+                </li>
+            </condition>
+          </li>
+        </random>
+      </li>
+    </condition>
+  </template>
+</category>
+
+<category>
+  <pattern>me gustaria (concertar) una cita (para) *</pattern>
+  <template>
+    <srai>quisiera una cita <star index="1"/></srai>
+  </template>
+</category>
+
+<category>
+  <pattern>como tienes * para (concertar) una cita</pattern>
+  <template>
+    <srai>quisiera una cita <star index="1"/></srai>
+  </template>
+</category>
+
+<topic name="hora dia">
+
+  <category>
+    <pattern>[si vale] a las *</pattern>
+    <template>
+      <think>
+        <set var="ocupado"> <srai>IS BUSY DAY <get name="fecha"/> AT <star index="1"/></srai></set>
+      </think>
+      <condition var="ocupado">
+        <li><value>TRUE</value>Esa hora esta ocupada, ¿desea otra hora?</li>
+        <li><value>FALSE</value>
+          <think>
+            <srai>MARK NOLIBRE AT <star index="1"/> ON <get name="fecha"/> </srai>
+          </think>
+          Perfecto, le reservo a esa hora.
+        </li>
+      </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern>a las *</pattern>
+    <template>
+      <srai>si a las <star index="1"/></srai>
+    </template>
+  </category>
+
+  <category>
+    <pattern>[puede podria] (ser) a las *</pattern>
+    <template>
+      <srai>si a las <star index="1"/></srai>
+    </template>
+  </category>
+
+  <category>
+    <pattern>me gustaria (concertar) (la cita) a las *</pattern>
+    <template>
+      <srai> si a las <star index="1"/></srai>
+    </template>
+  </category>
+
+    <category>
+      <pattern>[si vale]</pattern>
+      <template>
+        <random>
+          <li>¿Para que hora quisiera la cita?</li>
+          <li>¿Cuando le viene bien la cita?</li>
+          <li>¿A que hora le viene bien la cita?</li>
+          <li>¿A que hora puede?</li>
+        </random>
+      </template>
+    </category>
+
+    <category>
+      <pattern>no</pattern>
+      <template>
+        <random>
+          <li>Vale, que tenga un buen dia.</li>
+          <li>Buen dia.</li>
+          <li>Esta bien, adios.</li>
+        </random>
+      </template>
+    </category>
+
+  <category>
+    <pattern>me [da es] igual</pattern>
+    <template>
+      <think>
+        <set var="primera"><srai>TOP <get name="horas dia"/></srai></set>
+        <srai>MARK NOLIBRE AT <get var="primera"/> ON <get name="fecha"/></srai>
+      </think>
+      Perfecto, le reservo a las <get var="primera"/>.
+    </template>
+  </category>
+</topic>
+
+
+
+<!-- MANYANA-->
+<category>
+  <pattern>[quiero querria quisiera] (concertar) una cita (para) * por la manyana</pattern>
+  <template>
+    <think>
+      <set name="horas dia manyana"><srai>HORASLIBRES <star index="1"/> por la manyana</srai></set>
+    </think>
+    <condition name="horas dia manyana">
+      <li><value></value>Lo siento no puedo esta ocupado , ¿desea <set name="topic">otro dia</set>?</li>
+      <li><value>MAL</value>Especifique (hoy manyana o pasado manyana)</li>
+      <li>
+        Muy bien voy a comprobarlo, espere un momento...
+        <random>
+          <li><think><set name="topic">hora dia manyana</set></think>
+            ¿Quisiera alguna hora en concreto?
+          </li>
+          <li>
+            <think><set name="topic">hora2</set></think>
+            Pues por la manyana tengo los siguientes huecos libres <get name="horas dia manyana"/>
+          </li>
+        </random>
+      </li>
+    </condition>
+  </template>
+</category>
+
+<category>
+  <pattern>me gustaria (concertar) una cita (para) * por la manyana</pattern>
+  <template>
+    <srai>quisiera una cita <star index="1"/> por la manyana</srai>
+  </template>
+</category>
+
+<category>
+  <pattern>como tienes * para (concertar) una cita por la manyana</pattern>
+  <template>
+    <srai>quisiera una cita <star index="1"/> por la manyana</srai>
+  </template>
+</category>
+
+
+
+<topic name="hora dia manyana">
+
+  <category>
+    <pattern>[si vale] a las *</pattern>
+    <template>
+      <think>
+        <set var="ocupado"> <srai>IS BUSY DAY <get name="fecha"/> AT <star index="1"/></srai></set>
+      </think>
+      <condition var="ocupado">
+        <li><value>TRUE</value>Esa hora esta ocupada, ¿desea otra hora?</li>
+        <li><value>FALSE</value>
+          <think>
+            <srai>MARK NOLIBRE AT <star index="1"/> ON <get name="fecha"/> </srai>
+          </think>
+          Perfecto, le reservo a esa hora.
+        </li>
+      </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern>a las *</pattern>
+    <template>
+      <srai>si a las <star index="1"/></srai>
+    </template>
+  </category>
+
+  <category>
+    <pattern>[puede podria] (ser) a las *</pattern>
+    <template>
+      <srai>si a las <star index="1"/></srai>
+    </template>
+  </category>
+
+  <category>
+    <pattern>me gustaria (concertar) (la cita) a las *</pattern>
+    <template>
+      <srai> si a las <star index="1"/></srai>
+    </template>
+  </category>
+
+    <category>
+      <pattern>[si vale]</pattern>
+      <template>
+        <random>
+          <li>¿Para que hora quisiera la cita?</li>
+          <li>¿Cuando le viene bien la cita?</li>
+          <li>¿A que hora le viene bien la cita?</li>
+          <li>¿A que hora puede?</li>
+        </random>
+      </template>
+    </category>
+
+    <category>
+      <pattern>no</pattern>
+      <template>
+        <random>
+          <li>Vale, que tenga un buen dia.</li>
+          <li>Buen dia.</li>
+          <li>Esta bien, adios.</li>
+        </random>
+      </template>
+    </category>
+
+  <category>
+    <pattern>me [da es] igual</pattern>
+    <template>
+      <think>
+        <set var="primera"><srai>TOP <get name="horas dia manyana"/></srai></set>
+        <srai>MARK NOLIBRE AT <get var="primera"/> ON <get name="fecha"/></srai>
+      </think>
+      Perfecto, le reservo a las <get var="primera"/>.
+    </template>
+  </category>
+</topic>
+
+
+<!-- TARDE -->
+
+<category>
+  <pattern>[quiero querria quisiera] (concertar) una cita (para) * por la tarde</pattern>
+  <template>
+    <think>
+      <set name="horas dia tarde"><srai>HORASLIBRES <star index="1"/> por la tarde</srai></set>
+    </think>
+    <condition name="horas dia tarde">
+      <li><value></value>Lo siento no puedo esta ocupado , ¿desea <set name="topic">otro dia</set>?</li>
+      <li><value>MAL</value>Especifique (hoy manyana o pasado manyana)</li>
+      <li>
+        Muy bien voy a comprobarlo, espere un momento...
+        <random>
+          <li><think><set name="topic">hora dia tarde</set></think>
+            ¿Quisiera alguna hora en concreto?
+          </li>
+          <li>
+            <think><set name="topic">hora2</set></think>
+            Pues por la tarde tengo los siguientes huecos libres <get name="horas dia tarde"/>
+          </li>
+        </random>
+      </li>
+    </condition>
+  </template>
+</category>
+
+<category>
+  <pattern>me gustaria (concertar) una cita (para) * por la tarde</pattern>
+  <template>
+    <srai>quisiera una cita <star index="1"/> por la tarde</srai>
+  </template>
+</category>
+
+<category>
+  <pattern>como tienes * para (concertar) una cita por la tarde</pattern>
+  <template>
+    <srai>quisiera una cita <star index="1"/> por la tarde</srai>
+  </template>
+</category>
+
+
+
+<topic name="hora dia tarde">
+
+  <category>
+    <pattern>[si vale] a las *</pattern>
+    <template>
+      <think>
+        <set var="ocupado"> <srai>IS BUSY DAY <get name="fecha"/> AT <star index="1"/></srai></set>
+      </think>
+      <condition var="ocupado">
+        <li><value>TRUE</value>Esa hora esta ocupada, ¿desea otra hora?</li>
+        <li><value>FALSE</value>
+          <think>
+            <srai>MARK NOLIBRE AT <star index="1"/> ON <get name="fecha"/> </srai>
+          </think>
+          Perfecto, le reservo a esa hora.
+        </li>
+      </condition>
+    </template>
+  </category>
+
+  <category>
+    <pattern>a las *</pattern>
+    <template>
+      <srai>si a las <star index="1"/></srai>
+    </template>
+  </category>
+
+  <category>
+    <pattern>[puede podria] (ser) a las *</pattern>
+    <template>
+      <srai>si a las <star index="1"/></srai>
+    </template>
+  </category>
+
+  <category>
+    <pattern>me gustaria (concertar) (la cita) a las *</pattern>
+    <template>
+      <srai> si a las <star index="1"/></srai>
+    </template>
+  </category>
+
+    <category>
+      <pattern>[si vale]</pattern>
+      <template>
+        <random>
+          <li>¿Para que hora quisiera la cita?</li>
+          <li>¿Cuando le viene bien la cita?</li>
+          <li>¿A que hora le viene bien la cita?</li>
+          <li>¿A que hora puede?</li>
+        </random>
+      </template>
+    </category>
+
+    <category>
+      <pattern>no</pattern>
+      <template>
+        <random>
+          <li>Vale, que tenga un buen dia.</li>
+          <li>Buen dia.</li>
+          <li>Esta bien, adios.</li>
+        </random>
+      </template>
+    </category>
+
+  <category>
+    <pattern>me [da es] igual</pattern>
+    <template>
+      <think>
+        <set var="primera"><srai>TOP <get name="horas dia tarde"/></srai></set>
+        <srai>MARK NOLIBRE AT <get var="primera"/> ON <get name="fecha"/></srai>
+      </think>
+      Perfecto, le reservo a las <get var="primera"/>.
+    </template>
+  </category>
+</topic>
+
+    <!-- HORA -->
+
+    <category>
+      <pattern>[quiero querria quisiera] (concertar) una cita (para) * a partir de las *</pattern>
+      <template>
+        <think>
+          <set name="horas dia hora"><srai>HORASLIBRES <star index="1"/> a partir de las <star index="2"/></srai></set>
+        </think>
+        <condition name="horas dia hora">
+          <li><value></value>Lo siento no puedo esta ocupado , ¿desea <set name="topic">otro dia</set>?</li>
+          <li><value>MAL</value>Especifique (hoy manyana o pasado manyana)</li>
+          <li>
+            Muy bien voy a comprobarlo, espere un momento...
+            <random>
+              <li><think><set name="topic">hora dia hora</set></think>
+                ¿Quisiera alguna hora en concreto?
+              </li>
+              <li>
+                <think><set name="topic">hora2</set></think>
+                Pues  a partir de las <star index="2"/> tengo los siguientes huecos libres <get name="horas dia hora"/>
+              </li>
+            </random>
+          </li>
+        </condition>
+      </template>
+    </category>
+
+    <category>
+      <pattern>me gustaria (concertar) una cita (para) * a partir de las *</pattern>
+      <template>
+        <srai>quisiera una cita <star index="1"/> a partir de las <star index="2"/></srai>
+      </template>
+    </category>
+
+    <category>
+      <pattern>como tienes * para (concertar) una cita a partir de las *</pattern>
+      <template>
+        <srai>quisiera una cita <star index="1"/> a partir de las <star index="2"/></srai>
+      </template>
+    </category>
+
+    <!-- TOPIC DIA HORA-->
+
+    <topic name="hora dia hora">
+
+      <category>
+        <pattern>[si vale] a las *</pattern>
+        <template>
+          <think>
+            <set var="ocupado"> <srai>IS BUSY DAY <get name="fecha"/> AT <star index="1"/></srai></set>
+          </think>
+          <condition var="ocupado">
+            <li><value>TRUE</value>Esa hora esta ocupada, ¿desea otra hora?</li>
+            <li><value>FALSE</value>
+              <think>
+                <srai>MARK NOLIBRE AT <star index="1"/> ON <get name="fecha"/> </srai>
+              </think>
+              Perfecto, le reservo a esa hora.
+            </li>
+          </condition>
+        </template>
+      </category>
+
+      <category>
+        <pattern>a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+      <category>
+        <pattern>[puede podria] (ser) a las *</pattern>
+        <template>
+          <srai>si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+      <category>
+        <pattern>me gustaria (concertar) (la cita) a las *</pattern>
+        <template>
+          <srai> si a las <star index="1"/></srai>
+        </template>
+      </category>
+
+        <category>
+          <pattern>[si vale]</pattern>
+          <template>
+            <random>
+              <li>¿Para que hora quisiera la cita?</li>
+              <li>¿Cuando le viene bien la cita?</li>
+              <li>¿A que hora le viene bien la cita?</li>
+              <li>¿A que hora puede?</li>
+            </random>
+          </template>
+        </category>
+
+        <category>
+          <pattern>no</pattern>
+          <template>
+            <random>
+              <li>Vale, que tenga un buen dia.</li>
+              <li>Buen dia.</li>
+              <li>Esta bien, adios.</li>
+            </random>
+          </template>
+        </category>
+
+      <category>
+        <pattern>me [da es] igual</pattern>
+        <template>
+          <think>
+            <set var="primera"><srai>TOP <get name="horas dia hora"/></srai></set>
+            <srai>MARK NOLIBRE AT <get var="primera"/> ON <get name="fecha"/></srai>
+          </think>
+          Perfecto, le reservo a las <get var="primera"/>.
+        </template>
+      </category>
+    </topic>
+
+</aiml>
